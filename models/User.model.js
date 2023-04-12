@@ -23,7 +23,7 @@ const userSchema = new Schema(
       default: "../public/image/default_image.jpg"
     },
     birthdate: {
-      type: date,
+      type: Date,
       required: false
     },
     location:{
