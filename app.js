@@ -23,6 +23,7 @@ app.use("/auth", authRoutes);
 
 // User routes
 app.use("/api", require("./routes/user.routes"))
+app.use("/api", require("./routes/travelguide.routes"))
 
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
