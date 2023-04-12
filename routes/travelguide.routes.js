@@ -59,3 +59,5 @@ router.get('/travelguide/:travelguideId', (req, res, next) => {
             });
         })
 });
+
+module.exports = router;
