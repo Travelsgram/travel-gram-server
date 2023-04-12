@@ -20,14 +20,14 @@ const userSchema = new Schema(
     },
     profileImg: {
       type: String,
-      default: "xxx"
+      default: "../public/image/default_image.jpg"
     },
     birthdate: {
       type: date,
       required: false
     },
     location:{
-      type: string,
+      type: String,
       required: true
     },
     followers:[{
