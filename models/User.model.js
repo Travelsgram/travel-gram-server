@@ -18,6 +18,26 @@ const userSchema = new Schema(
       type: String,
       required: [true, "Name is required."],
     },
+    profileImg: {
+      type: String,
+      default: "xxx"
+    },
+    birthdate: {
+      type: date,
+      required: false
+    },
+    location:{
+      type: string,
+      required: true
+    },
+    followers:[{
+      type: Schema.Types.ObjectId,
+      ref: "User"
+    }],
+    posts:[{
+      type: Schema.Types.ObjectId,
+      ref: "Post"
+    }]
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
