@@ -28,7 +28,7 @@ const userSchema = new Schema(
     },
     location:{
       type: String,
-      required: true
+      required: false
     },
     followers:[{
       type: Schema.Types.ObjectId,

@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 router.post("/travelguide", (req,res,next) => {
     const {title, image, location, description, activities, tips} = req.body;
 
-    Travelguide.create ({ title, image, location, description, activities, tips})
+    Travelguide.create ({ title, image, activities, tips, location, description, })
     .then(response => res.status(201).json(response))
     .catch(err => {
         console.log("error creating a new travelguide", err);
