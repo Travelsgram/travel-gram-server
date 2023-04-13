@@ -3,8 +3,10 @@ const router = express.Router();
 
 const User = require("../models/User.model");
 
+const { isAuthenticated } = require("../middleware/jwt.middleware")
 
-router.get("/users", (req, res, next) => {
+
+router.get("/users", isAuthenticated, (req, res, next) => {
 
     User.find()
         .then( usersFromDB => {
@@ -13,7 +15,7 @@ router.get("/users", (req, res, next) => {
         .catch( err => console.log("error getting users from DB", err))
 })
 
-router.get("/users/:id", (req, res, next) => {
+router.get("/users/:id", isAuthenticated, (req, res, next) => {
     const {id} = req.params
 
     User.findById(id)
@@ -23,7 +25,7 @@ router.get("/users/:id", (req, res, next) => {
         .catch( err => console.log("error finding user by id", err))
 })
 
-router.put("/users/:id", (req, res, next) => {
+router.put("/users/:id", isAuthenticated, (req, res, next) => {
     const { id } = req.params;
     const { email, name, profileImg, location, } = req.body
 
@@ -35,7 +37,7 @@ router.put("/users/:id", (req, res, next) => {
 
 })
 
-router.delete("/users/:id", (req, res, next) => {
+router.delete("/users/:id", isAuthenticated, (req, res, next) => {
     const {id} = req.params
 
     User.findByIdAndDelete(id)

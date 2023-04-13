@@ -20,7 +20,7 @@ const userSchema = new Schema(
     },
     profileImg: {
       type: String,
-      default: "../public/image/default_image.jpg"
+      default: ""
     },
     birthdate: {
       type: Date,
@@ -37,6 +37,10 @@ const userSchema = new Schema(
     posts:[{
       type: Schema.Types.ObjectId,
       ref: "Post"
+    }],
+    travelguides:[{
+      type: Schema.Types.ObjectId,
+      ref: "Travelguide"
     }]
   },
   {
