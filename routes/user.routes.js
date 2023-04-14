@@ -7,7 +7,7 @@ const { isAuthenticated } = require("../middleware/jwt.middleware")
 
 
 router.get("/users", isAuthenticated, (req, res, next) => {
-
+    
     User.find()
         .then( usersFromDB => {
             res.status(201).json(usersFromDB)
@@ -19,6 +19,8 @@ router.get("/users/:id", isAuthenticated, (req, res, next) => {
     const {id} = req.params
 
     User.findById(id)
+        .populate("posts")
+        .populate("travelguides")
         .then( user => {
             res.status(201).json(user)
         })

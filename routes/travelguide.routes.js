@@ -1,15 +1,29 @@
 const express = require("express");
 const router = express.Router();
-const Travelguide = require('../models/Travelguide.model');
 const mongoose = require("mongoose");
 
+const Travelguide = require('../models/Travelguide.model');
+const User = require("../models/User.model")
+
+const { isAuthenticated } = require("../middleware/jwt.middleware");
 
 // POST /api/travelguide
-router.post("/travelguide", (req,res,next) => {
-    const {title, image, location, description, activities, tips} = req.body;
+router.post("/travelguide", isAuthenticated, (req,res,next) => {
+    const {title, image, location, description, activities, tips, user} = req.body;
+    const id = req.payload._id;
 
-    Travelguide.create ({ title, image, activities, tips, location, description, })
-    .then(response => res.status(201).json(response))
+    Travelguide.create ({ title, image, activities, tips, location, description, user })
+    .then(response => {
+        const data = {
+            travelguides: response,
+        }
+
+        return User.findByIdAndUpdate( id, data, {new:true} )
+
+    })
+    .then( updatedUser => {
+        res.status(201).json(updatedUser)
+    })
     .catch(err => {
         console.log("error creating a new travelguide", err);
         res.status(500).json({
@@ -59,5 +73,21 @@ router.get('/travelguide/:travelguideId', (req, res, next) => {
             });
         })
 });
+
+router.delete('/travelguide/:travelguideId', (req, res, next) => {
+    const { travelguideId } = req.params;
+
+    Travelguide.findByIdAndDelete(travelguideId)
+        .then( response => {
+            res.status(200).json(response)
+        })
+        .catch(err => {
+            console.log("error deleting travelguide from DB", err);
+            res.status(500).json({
+                message: "error deleting travelguide from DB",
+                error: err
+            });
+        })
+})
 
 module.exports = router;
