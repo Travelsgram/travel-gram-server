@@ -35,6 +35,7 @@ router.post("/posts", isAuthenticated, (req, res, next) => {
 router.get("/posts", (req, res, next) => {
 
     Post.find()
+        .populate("user")
         .then( postsFromDB => {
             res.status(200).json(postsFromDB)
         })
