@@ -14,11 +14,9 @@ router.post("/travelguide", isAuthenticated, (req,res,next) => {
 
     Travelguide.create ({ title, image, activities, tips, location, description, user })
     .then(response => {
-        const data = {
-            travelguides: response,
-        }
+        const { _id, title, image, activities, tips, location, description, user } = response
 
-        return User.findByIdAndUpdate( id, data, {new:true} )
+        return User.findByIdAndUpdate( id, {$push: {"travelguides": { _id, title, image, activities, tips, location, description, user:id }}}, {safe: true, upsert: true, new : true})
 
     })
     .then( updatedUser => {

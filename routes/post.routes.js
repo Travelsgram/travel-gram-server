@@ -12,11 +12,9 @@ router.post("/posts", isAuthenticated, (req, res, next) => {
 
     Post.create({ image, comment, location, user })
         .then( newPost => {
-            const data = {
-                posts: newPost,
-            }
+           const { _id, image, comment, location, user } = newPost;
             
-            return User.findByIdAndUpdate( id, data, {new: true} )
+            return User.findByIdAndUpdate( id, {$push: {"posts": { _id, image, comment, location, user:id }}}, {safe: true, upsert: true, new : true})
             
         })
         .then( updatedUser => {
