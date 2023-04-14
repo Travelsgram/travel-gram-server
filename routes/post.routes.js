@@ -2,13 +2,25 @@ const express = require("express");
 const router = express.Router();
 const fileUploader = require("../config/cloudinary.config");
 const Post = require("../models/Post.model");
+const User = require("../models/User.model");
 
-router.post("/posts", (req, res, next) => {
-    const { image, comment, location, } = req.body
+const { isAuthenticated } = require("../middleware/jwt.middleware")
 
-    Post.create({ image, comment, location, })
+router.post("/posts", isAuthenticated, (req, res, next) => {
+    const { image, comment, location, user } = req.body
+    const id = req.payload._id;
+
+    Post.create({ image, comment, location, user })
         .then( newPost => {
-            res.status(201).json(newPost)
+            const data = {
+                posts: newPost,
+            }
+            
+            return User.findByIdAndUpdate( id, data, {new: true} )
+            
+        })
+        .then( updatedUser => {
+            res.status(201).json(updatedUser)
         })
         .catch(err => {
             console.log("error creating post", err);
@@ -23,6 +35,7 @@ router.post("/posts", (req, res, next) => {
 router.get("/posts", (req, res, next) => {
 
     Post.find()
+        .populate("user")
         .then( postsFromDB => {
             res.status(200).json(postsFromDB)
         })
