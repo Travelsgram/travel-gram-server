@@ -46,6 +46,7 @@ router.get("/posts", (req, res, next) => {
         })
 })
 
+
 // POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
 router.post("/upload", fileUploader.single("image"), (req, res, next) => {
     // console.log("file is: ", req.file)
@@ -60,6 +61,31 @@ router.post("/upload", fileUploader.single("image"), (req, res, next) => {
     
     res.json({ fileUrl: req.file.path });
   });
+
+router.get("/posts/:postId", isAuthenticated, (req, res, next) => {
+    const { postId } = req.params;
+    const _id = req.payload._id;
+
+    Post.findByIdAndUpdate( postId, {$push: {"likes": { _id }}}, {safe: true, upsert: true, new : true})
+    /*Post.findById(postId,{ likes: { $elemMatch:  {_id:_id} }})
+        .then( postFromDB => {
+            console.log(postFromDB);
+            if(!postFromDB._id){
+                return Post.findByIdAndUpdate( postId, {$push: {"likes": { _id }}}, {safe: true, upsert: true, new : true})
+            }       
+        })*/
+        .then( updatedPost => {
+            res.status(201).json(updatedPost)
+        })
+        .catch(err => {
+            console.log("error creating new like", err);
+            res.status(500).json({
+                message: "error creating new like",
+                error: err
+            });
+        })
+
+})
 
 router.delete("/posts/:postId", (req, res, next ) => {
     const { postId } = req.params;
