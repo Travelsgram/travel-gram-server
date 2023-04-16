@@ -15,6 +15,30 @@ router.get("/users", isAuthenticated, (req, res, next) => {
         .catch( err => console.log("error getting users from DB", err))
 })
 
+router.get("/users/follow/:id", isAuthenticated, (req,res, next) => {
+    const followId = req.params.id
+    const _id = req.payload._id;
+
+    User.findById(_id)
+        .populate("followers")
+        .then( response => {
+            
+            let userInFollowers = false;
+            response.followers.forEach( element => {
+                if(element._id === followId){
+                    userInLikes = true;
+                }
+            })
+            if(!userInFollowers){
+                return User.findByIdAndUpdate(_id, {$push: {"followers": { _id:followId }}}, {safe: true, upsert: true, new : true})
+            }
+        })
+        .then( response => {
+            console.log(response)
+        })
+        .catch( err => console.log("error finding user by id", err))
+})
+
 router.get("/users/:id", isAuthenticated, (req, res, next) => {
     const {id} = req.params
 
