@@ -14,6 +14,10 @@ const postSchema = new Schema(
         type: String,
         required: true
     },
+    tags:{
+        type: [String],
+        required: false
+    },
     likes:[{
         type: Schema.Types.ObjectId,
         ref: "User"

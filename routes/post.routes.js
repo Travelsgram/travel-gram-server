@@ -7,14 +7,15 @@ const User = require("../models/User.model");
 const { isAuthenticated } = require("../middleware/jwt.middleware")
 
 router.post("/posts", isAuthenticated, (req, res, next) => {
-    const { image, comment, location, user } = req.body
+    const { image, comment, location, tags, user } = req.body
     const id = req.payload._id;
 
-    Post.create({ image, comment, location, user })
+    Post.create({ image, comment, location, tags, user })
         .then( newPost => {
-           const { _id, image, comment, location, user } = newPost;
+           const { _id, image, comment, location, tags, user } = newPost;
+           console.log(newPost)
             
-            return User.findByIdAndUpdate( id, {$push: {"posts": { _id, image, comment, location, user:id }}}, {safe: true, upsert: true, new : true})
+            return User.findByIdAndUpdate( id, {$push: {"posts": { _id, image, comment, location, tags, user:id }}}, {safe: true, upsert: true, new : true})
             
         })
         .then( updatedUser => {

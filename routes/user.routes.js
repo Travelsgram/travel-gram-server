@@ -34,7 +34,7 @@ router.get("/users/follow/:id", isAuthenticated, (req,res, next) => {
             }
         })
         .then( response => {
-            console.log(response)
+            res.status(201).json(response)
         })
         .catch( err => console.log("error finding user by id", err))
 })
@@ -45,6 +45,7 @@ router.get("/users/:id", isAuthenticated, (req, res, next) => {
     User.findById(id)
         .populate("posts")
         .populate("travelguides")
+        .populate("followers")
         .then( user => {
             res.status(201).json(user)
         })
