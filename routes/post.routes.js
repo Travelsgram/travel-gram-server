@@ -83,7 +83,7 @@ router.get("/posts/:postId", isAuthenticated, (req, res, next) => {
                 return Post.findByIdAndUpdate( postId, {$pull: {"likes":  {_id:new ObjectId(_id)} }}, {safe: true,})
             }*/
         })
-    /*Post.findById(postId,{ likes: { $elemMatch:  {_id:new ObjectId(_id)} }})
+    /*Post.findById(postId,{ likes: { $elemMatch:  {new ObjectId(_id)} }})
         .then( postFromDB => {
             console.log(postFromDB);
             if(!postFromDB._id){

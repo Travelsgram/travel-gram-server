@@ -20,20 +20,20 @@ router.get("/users/follow/:id", isAuthenticated, (req,res, next) => {
     const _id = req.payload._id;
 
     User.findById(_id)
-        .populate("followers")
-        .then( response => {
-            
+    .populate("followers")
+    .then( response => {
             let userInFollowers = false;
+            
             response.followers.forEach( element => {
-                if(element._id === followId){
-                    userInLikes = true;
+                if(element.id === followId){
+                    userInFollowers = true;
                 }
             })
             if(!userInFollowers){
                 return User.findByIdAndUpdate(_id, {$push: {"followers": { _id:followId }}}, {safe: true, upsert: true, new : true})
             }
         })
-        .then( response => {
+        .then(response => {
             res.status(201).json(response)
         })
         .catch( err => console.log("error finding user by id", err))
