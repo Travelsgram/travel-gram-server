@@ -66,13 +66,29 @@ router.get("/posts/:postId", isAuthenticated, (req, res, next) => {
     const { postId } = req.params;
     const _id = req.payload._id;
 
-    Post.findByIdAndUpdate( postId, {$push: {"likes": { _id }}}, {safe: true, upsert: true, new : true})
-    /*Post.findById(postId,{ likes: { $elemMatch:  {_id:_id} }})
+    Post.findById(postId)
+        .populate("likes")
+        .then( response => {
+            let userInLikes = false;
+            response.likes.forEach( element => {
+                if(element.name === req.payload.name){
+                    userInLikes = true;
+                }
+            })
+            if(!userInLikes){
+               return Post.findByIdAndUpdate( postId, {$push: {"likes": { _id }}}, {safe: true, upsert: true, new : true})
+            }/*else{
+                console.log(_id)
+                return Post.findByIdAndUpdate( postId, {$pull: {"likes":  {_id:new ObjectId(_id)} }}, {safe: true,})
+            }*/
+        })
+    /*Post.findById(postId,{ likes: { $elemMatch:  {_id:new ObjectId(_id)} }})
         .then( postFromDB => {
             console.log(postFromDB);
             if(!postFromDB._id){
                 return Post.findByIdAndUpdate( postId, {$push: {"likes": { _id }}}, {safe: true, upsert: true, new : true})
             }       
+            
         })*/
         .then( updatedPost => {
             res.status(201).json(updatedPost)
