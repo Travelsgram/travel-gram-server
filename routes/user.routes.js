@@ -7,7 +7,9 @@ const { isAuthenticated } = require("../middleware/jwt.middleware")
 
 
 router.get("/users", isAuthenticated, (req, res, next) => {
-    
+    //const value = req.query.user
+    //{ name : { $eq: value } }
+
     User.find()
         .then( usersFromDB => {
             res.status(201).json(usersFromDB)
@@ -31,6 +33,8 @@ router.get("/users/follow/:id", isAuthenticated, (req,res, next) => {
             })
             if(!userInFollowers){
                 return User.findByIdAndUpdate(_id, {$push: {"followers": { _id:followId }}}, {safe: true, upsert: true, new : true})
+            }else if(userInFollowers){
+                return User.findByIdAndUpdate(_id, {$pull: {"followers": followId }}, {safe: true, upsert: true, new : true})
             }
         })
         .then(response => {

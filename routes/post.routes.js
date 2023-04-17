@@ -3,19 +3,20 @@ const router = express.Router();
 const fileUploader = require("../config/cloudinary.config");
 const Post = require("../models/Post.model");
 const User = require("../models/User.model");
+const Comment = require("../models/Comment.model");
 
 const { isAuthenticated } = require("../middleware/jwt.middleware")
 
 router.post("/posts", isAuthenticated, (req, res, next) => {
-    const { image, comment, location, tags, user } = req.body
+    const { image, description, location, tags, user } = req.body
     const id = req.payload._id;
 
-    Post.create({ image, comment, location, tags, user })
+    Post.create({ image, description, location, tags, user })
         .then( newPost => {
-           const { _id, image, comment, location, tags, user } = newPost;
+           const { _id, image, description, location, tags, user } = newPost;
            console.log(newPost)
             
-            return User.findByIdAndUpdate( id, {$push: {"posts": { _id, image, comment, location, tags, user:id }}}, {safe: true, upsert: true, new : true})
+            return User.findByIdAndUpdate( id, {$push: {"posts": { _id, image, description, location, tags, user:id }}}, {safe: true, upsert: true, new : true})
             
         })
         .then( updatedUser => {
@@ -30,11 +31,38 @@ router.post("/posts", isAuthenticated, (req, res, next) => {
         })
 })
 
+router.put("/posts", isAuthenticated, (req, res, next) => {
+    const _id = req.payload._id;
+    
+    const { post_id, text} = req.body;
+   
+    Comment.create({ user:_id, post: post_id, text })
+        .then( response => {
+            const commentId = response.id 
+            return Post.findByIdAndUpdate( post_id, {$push: {"comments": commentId }}, {safe: true, upsert: true, new : true})
+        })
+        .then( response => {
+            console.log(response)
+            res.status(201).json(response)
+        })
+        .catch(err => {
+            console.log("error adding comment to post", err);
+            res.status(500).json({
+                message: "error adding comment to post",
+                error: err
+            });
+        })
+})
 
-router.get("/posts", (req, res, next) => {
 
-    Post.find()
+/*router.get("/posts", (req, res, next) => {
+
+    const id = req.query
+    const value = id.search;
+    console.log(value);
+    Post.find({"tags": {$in: {value}}})
         .populate("user")
+        .populate("tags")
         .then( postsFromDB => {
             res.status(200).json(postsFromDB)
         })
@@ -45,7 +73,7 @@ router.get("/posts", (req, res, next) => {
                 error: err
             });
         })
-})
+})*/
 
 
 // POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
@@ -63,6 +91,28 @@ router.post("/upload", fileUploader.single("image"), (req, res, next) => {
     res.json({ fileUrl: req.file.path });
   });
 
+router.get("/posts", (req, res, next) => {
+
+    Post.find()
+        .populate("user")
+        .populate("tags")
+        .populate({
+            path: "comments",
+            populate: {
+                path: "user"
+            }
+        })
+        .then( postsFromDB => {
+            res.status(200).json(postsFromDB)
+        })
+        .catch(err => {
+            console.log("error getting posts from DB", err);
+            res.status(500).json({
+                message: "error getting posts",
+                error: err
+            });
+        })
+})
 router.get("/posts/:postId", isAuthenticated, (req, res, next) => {
     const { postId } = req.params;
     const _id = req.payload._id;
@@ -72,25 +122,16 @@ router.get("/posts/:postId", isAuthenticated, (req, res, next) => {
         .then( response => {
             let userInLikes = false;
             response.likes.forEach( element => {
-                if(element.name === req.payload.name){
+                if(element.id === _id){
                     userInLikes = true;
                 }
             })
             if(!userInLikes){
                return Post.findByIdAndUpdate( postId, {$push: {"likes": { _id }}}, {safe: true, upsert: true, new : true})
-            }/*else{
-                console.log(_id)
-                return Post.findByIdAndUpdate( postId, {$pull: {"likes":  {_id:new ObjectId(_id)} }}, {safe: true,})
-            }*/
+            }else{   
+                return Post.findByIdAndUpdate( postId, {$pull: {"likes":  _id }}, {safe: true,})
+            }
         })
-    /*Post.findById(postId,{ likes: { $elemMatch:  {new ObjectId(_id)} }})
-        .then( postFromDB => {
-            console.log(postFromDB);
-            if(!postFromDB._id){
-                return Post.findByIdAndUpdate( postId, {$push: {"likes": { _id }}}, {safe: true, upsert: true, new : true})
-            }       
-            
-        })*/
         .then( updatedPost => {
             res.status(201).json(updatedPost)
         })
