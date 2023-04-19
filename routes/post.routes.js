@@ -54,28 +54,6 @@ router.put("/posts", isAuthenticated, (req, res, next) => {
         })
 })
 
-
-/*router.get("/posts", (req, res, next) => {
-
-    const id = req.query
-    const value = id.search;
-    console.log(value);
-    Post.find({"tags": {$in: {value}}})
-        .populate("user")
-        .populate("tags")
-        .then( postsFromDB => {
-            res.status(200).json(postsFromDB)
-        })
-        .catch(err => {
-            console.log("error getting posts from DB", err);
-            res.status(500).json({
-                message: "error getting posts",
-                error: err
-            });
-        })
-})*/
-
-
 // POST "/api/upload" => Route that receives the image, sends it to Cloudinary via the fileUploader and returns the image URL
 router.post("/upload", fileUploader.single("image"), (req, res, next) => {
     // console.log("file is: ", req.file)
