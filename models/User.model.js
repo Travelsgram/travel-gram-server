@@ -20,6 +20,7 @@ const userSchema = new Schema(
     },
     profileImg: {
       type: String,
+      required: false
       
     },
     birthdate: {
