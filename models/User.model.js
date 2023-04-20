@@ -20,15 +20,15 @@ const userSchema = new Schema(
     },
     profileImg: {
       type: String,
-      default: ""
+      
     },
     birthdate: {
       type: Date,
-      required: false
+      required: true
     },
     location:{
       type: String,
-      required: false
+      required: true
     },
     followers:[{
       type: Schema.Types.ObjectId,

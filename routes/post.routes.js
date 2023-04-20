@@ -71,7 +71,7 @@ router.post("/upload", fileUploader.single("image"), (req, res, next) => {
 
 router.get("/posts", (req, res, next) => {
 
-    Post.find()
+    Post.find().sort({ createdAt: -1 })
         .populate("user")
         .populate("tags")
         .populate({
